@@ -2,11 +2,14 @@ const std = @import("std");
 
 const cwd = std.fs.cwd();
 
-const alloc = std.heap.page_allocator;
+
 const ArrayList = std.ArrayList;
 
 const expect = std.testing.expect;
 pub fn main() void {
+
+    var allocator = std.heap.GeneralPurposeAllocator(.{}){};
+    const alloc = allocator.allocator();
 
     var args = try std.process.argsWithAllocator(alloc);
     defer args.deinit();
@@ -15,7 +18,7 @@ pub fn main() void {
     
     const inputFile: ?[:0]const u8 = args.next();
     const filePath = inputFile orelse {
-        std.debug.print("Missing File arg", .{}) ;
+        std.debug.print("Missing File arg\n", .{}) ;
         std.process.exit(0);};
 
     var file = cwd.openFile(filePath, .{}) catch |e| 
