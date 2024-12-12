@@ -2,8 +2,8 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{
-        .name = "d2T",
-        .root_source_file = b.path("d2T.zig"),
+        .name = "d2",
+        .root_source_file = b.path("d2.zig"),
         .target = b.host,
     });
 
