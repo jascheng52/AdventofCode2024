@@ -25,7 +25,9 @@ pub fn main() !void
 
     // print("Read :{s} type: {}\n", .{fileBuf, @TypeOf(fileBuf)});
     
-     print("Total: {any}\n", .{findMul(fileBuf)});
+    // print("Total: {any}\n", .{findMul(fileBuf)});
+    print("Total: {any}\n", .{findMulP2(fileBuf)});
+
     
 }
 
@@ -66,5 +68,58 @@ pub fn findMul(input : []const u8) !i32
     
     return total;
 }
+
+pub fn findMulP2(input : []const u8) !i32
+{
+    var split  = std.mem.splitAny(u8 ,input, "\n");
+    
+    var total : i32 = 0;
+    var canMul: bool = true;
+    while (split.next()) |word|
+    {
+        print("word : {s}\n", .{word});
+        var isMul: bool = false;
+        switch (matchCase(word)) {
+            0 => canMul = true,
+            2 => canMul = false,
+            1 => isMul = true,
+            else => canMul = canMul
+        }
+        print("canMul : {any}\n", .{canMul});
+
+        if(canMul and isMul)
+        {
+            var first : i32 = 0;
+            var second : i32 = 0;
+            const start = word[4..word.len];
+            var commaSplit  = std.mem.splitAny(u8 ,start, ",");
+            const firstStr = commaSplit.next() orelse "" ;
+            first = try std.fmt.parseInt(i32, firstStr, 10);
+
+            const secondPart = commaSplit.next() orelse "";
+            var secondParen = std.mem.splitAny(u8 ,secondPart, ")");
+            const secondStr = secondParen.next() orelse "";
+            second = try std.fmt.parseInt(i32, secondStr, 10);
+
+            total = total + first * second;
+        }
+    }
+    
+    return total;
+}
+
+pub fn matchCase(word: [] const u8) u32
+{
+    const dontString:[] const u8 = "don't()";
+    const doString:[] const u8= "do()";
+
+    if(std.mem.eql(u8, doString, word[0..4]))
+        return 0;
+    if(std.mem.eql(u8, dontString, word[0..7]))
+        return 2;
+    
+    return 1;
+}
+
 
 
