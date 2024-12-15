@@ -88,7 +88,22 @@ pub fn main() void {
         const diff = num1 - num2;
         sum += @abs(diff);
     }
-
     std.debug.print("Success {d}\n", .{sum}) ;
+
+    std.debug.print("Sim Score {d}\n", .{sim(l1.items, l2.items)}) ;
 }
 
+
+pub fn sim(l1:[]i32, l2:[]i32) u32
+{   
+    var simScore : u32 = 0;
+    for(l1) |i|
+    {
+        for(l2) |j|
+        {
+            if(i == j)
+                simScore += @abs(i);
+        }
+    }
+    return simScore;
+}
