@@ -2,7 +2,7 @@ const std = @import("std");
 
 const ArrayList = std.ArrayList;
 
-pub fn main() void {
+pub fn main() !void {
 
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const alloc = gpa.allocator();
@@ -40,13 +40,26 @@ pub fn main() void {
     var numSuc: i32 = 0;
     while(lineDelim) |line|
     {
-        if(verifyLine(line)) 
+        var skipIndex: i32 = -1 ;
+        while(skipIndex < line.len) 
         {
-            numSuc += 1;
-            std.debug.print("Line: {s} is {}\n", .{line, true});
+            if(verifyLine(line,skipIndex) )
+            {
+                numSuc += 1;
+                std.debug.print("Line: {s} is {}\n", .{line, true});
+                break;
+            }
+            skipIndex += 1;
         }
-        else {std.debug.print("Line: {s} is {}\n", .{line, false});
-}
+        //Uncomment for p1
+        // if(verifyLine(line,-1) )
+        // {
+        //     numSuc += 1;
+        //     std.debug.print("Line: {s} is {}\n", .{line, true});
+        //     continue;
+        // }
+        // else {std.debug.print("Line: {s} is {}\n", .{line, false});
+        // }
         lineDelim = inputFileRes.reader().readUntilDelimiterOrEof(lineMem, '\n') catch |e| {
             std.debug.print("Error Parsing file {}\n", .{e});
             std.process.exit(0);
@@ -56,15 +69,21 @@ pub fn main() void {
 }
 
 
-pub fn verifyLine(line: []u8) bool
+pub fn verifyLine(line: []u8, skipIndex : i32) bool
 {
     var lineSpliited = std.mem.splitAny(u8, line, " ");
 
     var prevNum : i32 = -1;
     var modifer: i32 = 0;
+    var index: i32 = 0;
     while (lineSpliited.next()) |word| 
     {
-        std.debug.print("Cur Word {s}\n", .{word});
+        std.debug.print("Cur Word {s}, index: {d}\n", .{word,index});
+        if(skipIndex == index)
+        {
+            index += 1;
+            continue;
+        }
         if (prevNum == -1) 
         {
             prevNum = std.fmt.parseInt(i32, word, 10) catch |e| {
@@ -72,6 +91,7 @@ pub fn verifyLine(line: []u8) bool
                 std.process.exit(0);
             };
             std.debug.print("Assigning init {s}\n", .{word});
+            index += 1;
             continue;
         }
         const curNum = std.fmt.parseInt(i32, word, 10) catch |e| {
@@ -96,6 +116,8 @@ pub fn verifyLine(line: []u8) bool
         if (diff > 3)
             return false;
         prevNum = curNum;
+        index += 1;
+
     }
     
     return true;
